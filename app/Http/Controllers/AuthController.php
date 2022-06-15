@@ -6,7 +6,6 @@ use App\Http\Requests\SignInUserRequest;
 use App\Http\Requests\SignupUserRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -14,11 +13,12 @@ class AuthController extends Controller
     public function register(SignupUserRequest $request): JsonResponse
     {
         $validated_fields = $request->safe()->only(['username', 'password']);
+
         $user = User::create($validated_fields);
         $token = $user->createToken("user-auth'")->plainTextToken;
 
         $response = [
-            'access_token' => $token,
+            'access_token' => $token
         ];
 
         return response()->json($response);
@@ -37,7 +37,7 @@ class AuthController extends Controller
         $token = $user->createToken('user-auth')->plainTextToken;
 
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $token
         ]);
     }
 }
