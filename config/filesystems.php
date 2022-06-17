@@ -36,6 +36,12 @@ return [
             'throw' => false,
         ],
 
+        'opt' => [
+            'driver' => 'local',
+            'root' => '/opt/'.env("APP_NAME"),
+            'throw' => true,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -73,4 +79,6 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'backup_path'=>'/opt/backup',
+    'user_data_path'=>'/opt/'.env('APP_NAME'),
 ];
