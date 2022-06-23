@@ -20,11 +20,12 @@ class UserController extends Controller
         return $process->getCurrentProcesses();
     }
 
-    public function createDirectory($name): JsonResponse
+    public function createDirectory($path): JsonResponse
     {
-        $path = $this->generateFilePath($name);
         try {
-            File::makeDirectory($path, 0755, true);
+            $username = Auth::user()->username;
+            $path = config("filesystems.user_data_path") ."/$username/$path";
+            $this->makeDirectory($path);
             return response()->json(['message' => 'successfully created!']);
         } catch (\Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 406);
@@ -33,9 +34,11 @@ class UserController extends Controller
 
     public function createFile($name): JsonResponse
     {
-        $path = $this->generateFilePath($name);
+        $path = config("filesystems.user_data_path") . Auth::user()->username;
+        $file_path  = "$path/$name";
+        $this->makeDirectory($path);
         try {
-            File::put($path, "");
+            File::put($file_path, "");
             return response()->json(['message' => 'successfully created!']);
         } catch (\Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 406);
@@ -70,13 +73,8 @@ class UserController extends Controller
         }
     }
 
-    private function generateFilePath($name): string
+    public function usersBackupData()
     {
-        $username = Auth::user()->username;
-        return config("filesystems.user_data_path")."$username/$name";
-    }
-
-    public function usersBackupData(){
         // vars
         $y_m_d_date = Carbon::now()->format("Y-m-d");
         $zipPath = config("filesystems.backup_path");
@@ -93,10 +91,15 @@ class UserController extends Controller
                 $zipPath .= "/$username_folder_name";
                 $userDataPath .= "/$username_folder_name";
                 // make backup directory by username
-                if (!File::isDirectory($zipPath))
-                    File::makeDirectory($zipPath, recursive: true);
+                $this->makeDirectory($zipPath);
                 // zip folder
                 $zip->zipFolder("$zipPath/$y_m_d_date.zip", $userDataPath);
             });
+    }
+
+    private function makeDirectory($path)
+    {
+        if (!File::isDirectory($path))
+            File::makeDirectory($path, recursive: true);
     }
 }
