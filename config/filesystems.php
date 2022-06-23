@@ -80,5 +80,5 @@ return [
     ],
 
     'backup_path'=>'/opt/backup',
-    'user_data_path'=>'/opt/'.env('APP_NAME'),
+    'user_data_path'=>'/opt/'.env('APP_NAME')."/",
 ];
